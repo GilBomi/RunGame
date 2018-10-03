@@ -27,17 +27,17 @@ public class GoGoGame extends JFrame{
 		introBackground=new ImageIcon(Main.class.getResource("../image/introBackground.jpg")).getImage();
 		
 		Music introMusic=new Music("ARRIVAL.MP3",true);
-		introMusic.start();
+		introMusic.start(); // 스레드 실행시작
 		setVisible(true);
 	}
 	public void paint(Graphics g) {
-		screenImage=createImage(1080,715);
-		screenGraphic=screenImage.getGraphics();
+		screenImage=createImage(1080,715); // 이미지 객체 생성
+		screenGraphic=screenImage.getGraphics(); // graphics 객체 받기
 		screenDraw(screenGraphic);
 		g.drawImage(screenImage, 0, 0, null);
 	}
 	public void screenDraw(Graphics g) {
-		g.drawImage(introBackground, 0, 0, null);
+		g.drawImage(introBackground, 0, 0, null); // 가상화면에 그려진 그림을 실제 화면으로 복사
 		this.repaint();
 	}
 

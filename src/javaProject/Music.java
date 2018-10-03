@@ -8,7 +8,7 @@ import javaProject.Main;
 import javazoom.jl.player.Player;
 
 public class Music extends Thread{
-	private Player player;
+	private Player player; // 게임 프로그램과 별도로 돌아가는 음악 프로그램이므로 동시에 돌아가려면 스레드로 처리
 	private boolean isLoop;
 	private File file;
 	private FileInputStream fls;
@@ -28,7 +28,7 @@ public class Music extends Thread{
 	public void close() {
 		isLoop=false;
 		player.close();
-		this.interrupt();
+		this.interrupt(); // 따로 돌아가는 음악 프로그램을 종료해줌
 	}
 	public void run() {
 		try {
