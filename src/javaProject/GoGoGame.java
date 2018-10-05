@@ -1,6 +1,5 @@
 package javaProject;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -13,30 +12,32 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+
 public class GoGoGame extends JFrame{
-	private Image introBackground;
+	private Image introBackground=new ImageIcon(Main.class.getResource("../image/introBackground.png")).getImage();
 	private Image screenImage;
 	private Graphics screenGraphic;
-	private ImageIcon startButtonImage=new ImageIcon(Main.class.getResource("../image/startButton.png"));
 	
+	private ImageIcon startButtonImage=new ImageIcon(Main.class.getResource("../image/startButton.png"));
 	private JButton startButton=new JButton(startButtonImage);
+	
 	public GoGoGame() {
+		//setUndecorated(true);
+		//setBackground(new Color(0, 0, 0, 0));
 		Toolkit kit=Toolkit.getDefaultToolkit();
 		Dimension screenSize=kit.getScreenSize();
 		setTitle("Go Go");
 		setSize(1080,715);
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setVisible(true);
+		setLayout(null);
 		setLocation(screenSize.width/8,screenSize.height/7);
-		Image img=kit.getImage("goIcon.png");
-		//Image img=kit.createImage("../image/goIcon.png");
+		// Image img=kit.getImage("goIcon.png");
+		Image img=kit.createImage("../image/goIcon.png");
 		setIconImage(img);
 		introBackground=new ImageIcon(Main.class.getResource("../image/introBackground.png")).getImage();
 		
-		Music introMusic=new Music("ARRIVAL.MP3",true);
-		introMusic.start(); // 스레드 실행시작
-		
-		setLayout(null);
 		
 		startButton.setBounds(100,180,300,100);
 		startButton.setBorderPainted(false);
@@ -58,18 +59,24 @@ public class GoGoGame extends JFrame{
 		});
 		add(startButton);
 		
-		setVisible(true);
+		
+		Music introMusic=new Music("ARRIVAL.MP3",true);
+		introMusic.start(); // 스레드 실행시작
 	}
-	public void paint(Graphics g) {
-		screenImage=createImage(1080,715); // 이미지 객체 생성
-		screenGraphic=screenImage.getGraphics(); // graphics 객체 받기
+	public void paint(Graphics g) { // // 이중 버퍼링기법(이미지 전환하면 화면 깜빡임이 없고 부드럽게 하기 위해서)
+		screenImage = createImage(1080, 715);
+		screenGraphic = screenImage.getGraphics();
 		screenDraw(screenGraphic);
 		g.drawImage(screenImage, 0, 0, null);
+		//screenGraphic.drawImage(background,0,0,null);
+		//g.drawImage(screenImage, 0, 0, null);
 	}
+
 	public void screenDraw(Graphics g) {
-		g.drawImage(introBackground, 0, 0, null); // 가상화면에 그려진 그림을 실제 화면으로 복사
+		g.drawImage(introBackground, 0, 0, null);
 		paintComponents(g);
 		this.repaint();
 	}
+
 
 }
