@@ -39,8 +39,10 @@ public class GoGoGame extends JFrame{
 	
 	private ImageIcon backButtonImage = new ImageIcon(Main.class.getResource("../image/backButton.png"));
 	private JButton backButton = new JButton(backButtonImage);
-
 	
+	private boolean characterPage=false;
+	private Image characterSelect=new ImageIcon(Main.class.getResource("../image/chimmy.png")).getImage();
+	private Image nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
 	private int mouseX, mouseY;
 	
 	public GoGoGame() {
@@ -121,6 +123,7 @@ public class GoGoGame extends JFrame{
 				exitButton1.setVisible(false);
 				startButton.setVisible(false);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
+				characterPage=true;
 			};
 		});
 		add(startButton);
@@ -183,6 +186,10 @@ public class GoGoGame extends JFrame{
 
 	public void screenDraw(Graphics g) {
 		g.drawImage(background, 0, 0, null);
+		if(characterPage) {
+			g.drawImage(characterSelect,30,100,null);
+			g.drawImage(nameSelect, 30,50,null);
+		}
 		paintComponents(g);
 		this.repaint();
 	}
