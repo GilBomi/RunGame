@@ -249,18 +249,18 @@ public class GoGoGame extends JFrame{
 	}
 	public void charSelect(int charSelectNum) {
 		switch(charSelectNum) {
-		case 0: {
+		case 0: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Chimmy.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
-			break;}
-		case 1: {
+			break;
+		case 1: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/RJ.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/rjName.png")).getImage();
-			break;}
-		case 2:{
+			break;
+		case 2:
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Koya.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/koyaName.png")).getImage();
-			break;}
+			break;
 		}
 	}
 	public void charRightSelect() {
