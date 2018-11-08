@@ -2,10 +2,8 @@ package javaProject;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -14,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 
 
@@ -52,7 +51,8 @@ public class GoGoGame extends JFrame{
 	private ImageIcon charSelectLeftButtonPressed=new ImageIcon(Main.class.getResource("../image/leftButtonPressed.png"));
 	private int mouseX, mouseY;
 	private int charSelectNum;
-
+	
+	private JTextField name;
 	public GoGoGame() {
 		setUndecorated(true); // frame을 없애고
 		setBackground(new Color(0, 0, 0,0)); // 배경을 투명으로 설정했기 때문에 그래픽에서 배경이미지와 버튼같은 컴포넌트만 표현됨
@@ -134,11 +134,17 @@ public class GoGoGame extends JFrame{
 				charSelectLeftButton.setVisible(true);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
 				characterPage=true;
+				
+				name=new JTextField(10);
+				name.setVisible(true);
+				name.setLocation(900,900);
+				add(name);
+				name.setLocation(1000,1000);
 
 			};
 		});
 		add(startButton);
-
+		
 		descriptionButton.setBounds(100,300,300,100); // 설명버튼
 		descriptionButton.setBorderPainted(false);
 		descriptionButton.setContentAreaFilled(false);
@@ -228,6 +234,9 @@ public class GoGoGame extends JFrame{
 		add(exitButton1);
 		Music introMusic=new Music("ARRIVAL.MP3",true);
 		introMusic.start(); // 스레드 실행시작
+		setLayout(null);
+		
+		
 
 
 	}
