@@ -112,7 +112,22 @@ public class GoGoGame extends JFrame{
 			}
 		});
 		add(menuBar);
-
+		
+		/*이 버튼은 이미지 만들어서 대체하기, 네트워크 보기 위해서 임시로 만듦*/
+		JButton test=new JButton("게임 시작");
+		test.setBounds(700,500,200,100);
+		test.setVisible(false);
+		add(test);
+		test.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				test.setVisible(false);
+				charSelectRightButton.setVisible(false);
+				charSelectLeftButton.setVisible(false);
+				characterPage=false;
+				name.setVisible(false);
+			}
+		});
+		
 		startButton.setBounds(100,200,300,100); // 시작버튼
 		startButton.setBorderPainted(false);
 		startButton.setContentAreaFilled(false);
@@ -137,6 +152,8 @@ public class GoGoGame extends JFrame{
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
 				characterPage=true;
 				name.setVisible(true);
+				/*임시로 만든 버튼, 나중에 이미지로 대체하기*/
+				test.setVisible(true);
 				
 			};
 		});
