@@ -38,6 +38,8 @@ public class GoGoGame extends JFrame{
 
 	private ImageIcon backButtonImage = new ImageIcon(Main.class.getResource("../image/backButton.png"));
 	private JButton backButton = new JButton(backButtonImage);
+	private ImageIcon backButtonPressedImage = new ImageIcon(Main.class.getResource("../image/backButtonPressed.png"));
+	private JButton backButtonPressed = new JButton(backButtonPressedImage);
 
 	private boolean characterPage=false;
 	private Image characterSelect=new ImageIcon(Main.class.getResource("../image/chimmy.png")).getImage();
@@ -134,16 +136,16 @@ public class GoGoGame extends JFrame{
 				charSelectLeftButton.setVisible(true);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
 				characterPage=true;
-				
-				name=new JTextField(10);
 				name.setVisible(true);
-				name.setLocation(900,900);
-				add(name);
-				name.setLocation(1000,1000);
-
+				
 			};
 		});
 		add(startButton);
+		
+		name = new JTextField(10);
+		name.setVisible(false);
+		name.setBounds(640, 180, 280, 35);
+		add(name);
 		
 		descriptionButton.setBounds(100,300,300,100); // 설명버튼
 		descriptionButton.setBorderPainted(false);
@@ -165,10 +167,37 @@ public class GoGoGame extends JFrame{
 				exitButton1.setVisible(false);
 				startButton.setVisible(false);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
+				backButton.setVisible(true);
 			}
 		});
 		add(descriptionButton);
 
+		backButton.setVisible(false);
+		backButton.setBounds(50, 70, 100, 100);
+		backButton.setBorderPainted(false);
+		backButton.setContentAreaFilled(false);
+		backButton.setFocusPainted(false);
+		backButton.addMouseListener(new MouseAdapter() {
+			public void mouseEntered(MouseEvent e) {
+				backButton.setIcon(backButtonPressedImage);
+				backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+			public void mouseExited(MouseEvent e) {
+				backButton.setIcon(backButtonImage);
+				backButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+			public void mousePressed(MouseEvent e) {
+				Music ButtonEnteredMusic=new Music("mouseClick.mp3",false);
+				ButtonEnteredMusic.start();
+				background=new ImageIcon(Main.class.getResource("../image/introBackground.png")).getImage();
+				startButton.setVisible(true);
+				descriptionButton.setVisible(true);
+				exitButton1.setVisible(true);
+				backButton.setVisible(false);
+			}
+		});
+		add(backButton);
+		
 		exitButton1.setBounds(100,400,300,100); // 종료버튼
 		exitButton1.setBorderPainted(false);
 		exitButton1.setContentAreaFilled(false);
@@ -210,6 +239,7 @@ public class GoGoGame extends JFrame{
 			}
 		});
 		add(charSelectRightButton);
+		
 		charSelectLeftButton.setVisible(false);
 		charSelectLeftButton.setBounds(20,250,60,60);
 		charSelectLeftButton.setBorderPainted(false);
@@ -232,9 +262,9 @@ public class GoGoGame extends JFrame{
 		});
 		add(charSelectLeftButton);
 		add(exitButton1);
+		
 		Music introMusic=new Music("ARRIVAL.MP3",true);
 		introMusic.start(); // 스레드 실행시작
-		setLayout(null);
 		
 		
 
