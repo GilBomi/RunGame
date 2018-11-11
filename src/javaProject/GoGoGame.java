@@ -7,6 +7,8 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,6 +46,7 @@ public class GoGoGame extends JFrame{
 	private boolean characterPage=false;
 	private Image characterSelect=new ImageIcon(Main.class.getResource("../image/chimmy.png")).getImage();
 	private Image nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
+	private Image characterFace;
 
 	private ImageIcon charSelectRightButtonImage = new ImageIcon(Main.class.getResource("../image/rightButton.png"));
 	private ImageIcon charSelectLefttButtonImage=new ImageIcon(Main.class.getResource("../image/leftButton.png"));
@@ -54,7 +57,8 @@ public class GoGoGame extends JFrame{
 	private int mouseX, mouseY;
 	private int charSelectNum;
 	
-	private JTextField name;
+	private JTextField jtname;
+	private String name;
 	public GoGoGame() {
 		setUndecorated(true); // frame을 없애고
 		setBackground(new Color(0, 0, 0,0)); // 배경을 투명으로 설정했기 때문에 그래픽에서 배경이미지와 버튼같은 컴포넌트만 표현됨
@@ -124,7 +128,19 @@ public class GoGoGame extends JFrame{
 				charSelectRightButton.setVisible(false);
 				charSelectLeftButton.setVisible(false);
 				characterPage=false;
-				name.setVisible(false);
+				
+				if(e.getSource()==test || e.getSource()==jtname) {
+					name=jtname.getText();
+				}
+				jtname.setVisible(false);
+				
+				try {
+					goClient client=new goClient(characterFace,name);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//client.start();
 			}
 		});
 		
@@ -151,7 +167,7 @@ public class GoGoGame extends JFrame{
 				charSelectLeftButton.setVisible(true);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
 				characterPage=true;
-				name.setVisible(true);
+				jtname.setVisible(true);
 				/*임시로 만든 버튼, 나중에 이미지로 대체하기*/
 				test.setVisible(true);
 				
@@ -159,10 +175,10 @@ public class GoGoGame extends JFrame{
 		});
 		add(startButton);
 		
-		name = new JTextField(10);
-		name.setVisible(false);
-		name.setBounds(640, 180, 280, 35);
-		add(name);
+		jtname = new JTextField(10);
+		jtname.setVisible(false);
+		jtname.setBounds(640, 180, 280, 35);
+		add(jtname);
 		
 		descriptionButton.setBounds(100,300,300,100); // 설명버튼
 		descriptionButton.setBorderPainted(false);
@@ -308,14 +324,17 @@ public class GoGoGame extends JFrame{
 		case 0: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Chimmy.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/chimmyFace.png")).getImage();
 			break;
 		case 1: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/RJ.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/rjName.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/rjFace.png")).getImage();
 			break;
 		case 2:
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Koya.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/koyaName.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/koyaFace.png")).getImage();
 			break;
 		}
 	}
