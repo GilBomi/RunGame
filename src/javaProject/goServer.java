@@ -1,44 +1,49 @@
 package javaProject;
 
-import java.awt.Image;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import javax.swing.JLabel;
 
 public class goServer {
 
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
-		ServerSocket ss=new ServerSocket(9001);
-
+		/*ServerSocket ss=new ServerSocket(9001);
+		System.out.println("1");
 		try {
 			while(true) {
+				System.out.println("2");
 				Player player1=new Player(ss.accept());
 				Player player2=new Player(ss.accept());
-
 				player1.setOther(player2);
 				player2.setOther(player1);
-
 				player1.start();
 				player2.start();
-				System.out.println("1");
 			}
+		} finally {
+			ss.close();
+		}*/
+		ServerSocket ss=new ServerSocket(9003);
+		System.out.println("서버 시작되었습니다.");
+		try {
+			Player player1=new Player(ss.accept(),'X');
+			Player player2=new Player(ss.accept(),'O');
+			player1.setOther(player2);
+			player2.setOther(player1);
+			player1.start();
+			player2.start();
+			System.out.println("페어 만들어짐");
 		} finally {
 			ss.close();
 		}
 	}
-
-
 }
 
 class Player extends Thread {
-	Socket socket;
+	/*Socket socket;
 	private ObjectInputStream input; // 바이트 읽어오기
 	private ObjectOutputStream output; // 사진 보내기
 	private DataInputStream in; // 기초 자료형 읽기
@@ -74,9 +79,9 @@ class Player extends Thread {
 	}
 	public void run() {
 		try {
+			other.output.writeObject(myFace);
+			other.out.writeUTF(goName);
 			while(true) {
-				other.output.writeObject(myFace);
-				other.out.writeUTF(goName);
 				other.out.writeInt(length);
 			}
 		} catch(IOException e) {
@@ -87,6 +92,33 @@ class Player extends Thread {
 			} catch(IOException e) {
 				System.out.println("5");
 			}
+		}
+	}*/
+	Socket socket;
+	BufferedReader input;
+	PrintWriter output;
+	char playerMark;
+	Player other;
+
+	public Player(Socket socket,char playerMark) {
+		this.socket=socket;
+		this.playerMark=playerMark;
+		try {
+			input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			output=new PrintWriter(socket.getOutputStream(),true);
+		} catch(IOException e) {
+			System.out.println("연결 끊어짐"+e);
+		}
+	}
+	public void setOther(Player other) {
+		this.other=other;	
+	}
+	public void run() {
+
+		System.out.println("연결 끊어짐");
+		try {
+			socket.close();
+		}catch(IOException e) {
 		}
 	}
 }

@@ -134,12 +134,18 @@ public class GoGoGame extends JFrame{
 				}
 				jtname.setVisible(false);
 				
+				
 				try {
-					goClient client=new goClient(characterFace,name);
+					goClient k=new goClient();
+					
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+
 				//client.start();
 			}
 		});
