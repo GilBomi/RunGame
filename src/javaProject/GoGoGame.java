@@ -4,10 +4,16 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
@@ -56,10 +62,17 @@ public class GoGoGame extends JFrame{
 	private ImageIcon charSelectLeftButtonPressed=new ImageIcon(Main.class.getResource("../image/leftButtonPressed.png"));
 	private int mouseX, mouseY;
 	private int charSelectNum;
-	
+
 	private JTextField jtname;
 	private String name;
-	public GoGoGame() {
+
+	private Socket socket;
+	private BufferedReader input;
+	private PrintWriter output;
+	private int speed=0;
+	private int length=100;
+
+	public GoGoGame() throws UnknownHostException,IOException{
 		setUndecorated(true); // frame을 없애고
 		setBackground(new Color(0, 0, 0,0)); // 배경을 투명으로 설정했기 때문에 그래픽에서 배경이미지와 버튼같은 컴포넌트만 표현됨
 		//Toolkit kit=Toolkit.getDefaultToolkit();
@@ -116,7 +129,7 @@ public class GoGoGame extends JFrame{
 			}
 		});
 		add(menuBar);
-		
+
 		/*이 버튼은 이미지 만들어서 대체하기, 네트워크 보기 위해서 임시로 만듦*/
 		JButton test=new JButton("게임 시작");
 		test.setBounds(700,500,200,100);
@@ -128,28 +141,54 @@ public class GoGoGame extends JFrame{
 				charSelectRightButton.setVisible(false);
 				charSelectLeftButton.setVisible(false);
 				characterPage=false;
-				
+
 				if(e.getSource()==test || e.getSource()==jtname) {
 					name=jtname.getText();
+					// jtname은 텍스트 필드
+					// name은 문자열
 				}
 				jtname.setVisible(false);
-				
-				
+				/*JLabel t=new JLabel("aaa");
+				t.setBounds(100,100,50,50);
+				add(t);*/
+
+				// goClient 생성자 메소드 내용
 				try {
-					goClient k=new goClient();
-					
-				} catch (UnknownHostException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					socket = new Socket("localhost",9001);
+					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					output = new PrintWriter(socket.getOutputStream(),true);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				JLabel label=new JLabel(name);
+				label.setBounds(100,100,50+speed,50);
+				add(label);
+				addKeyListener(new KeyListener() { 
+					@Override
+					public void keyPressed(KeyEvent e) {
+						if(e.getKeyChar()==' ') {
+							speed=10;
+						}
+						else 
+							speed=0;
+						length+=speed;
+						label.setBounds(length,100,50,50);
+					}
+					@Override
+					public void keyReleased(KeyEvent e) {}
+					@Override
+					public void keyTyped(KeyEvent e) {}
+				});
 
+
+				output.println(name);
+
+				(new MyThread()).start();
 				//client.start();
 			}
 		});
-		
+
 		startButton.setBounds(100,200,300,100); // 시작버튼
 		startButton.setBorderPainted(false);
 		startButton.setContentAreaFilled(false);
@@ -176,16 +215,16 @@ public class GoGoGame extends JFrame{
 				jtname.setVisible(true);
 				/*임시로 만든 버튼, 나중에 이미지로 대체하기*/
 				test.setVisible(true);
-				
+
 			};
 		});
 		add(startButton);
-		
+
 		jtname = new JTextField(10);
 		jtname.setVisible(false);
 		jtname.setBounds(640, 180, 280, 35);
 		add(jtname);
-		
+
 		descriptionButton.setBounds(100,300,300,100); // 설명버튼
 		descriptionButton.setBorderPainted(false);
 		descriptionButton.setContentAreaFilled(false);
@@ -236,7 +275,7 @@ public class GoGoGame extends JFrame{
 			}
 		});
 		add(backButton);
-		
+
 		exitButton1.setBounds(100,400,300,100); // 종료버튼
 		exitButton1.setBorderPainted(false);
 		exitButton1.setContentAreaFilled(false);
@@ -256,7 +295,7 @@ public class GoGoGame extends JFrame{
 				System.exit(0);
 			}
 		});
-		
+
 		charSelectRightButton.setVisible(false);
 		charSelectRightButton.setBounds(380,250,60,60);
 		charSelectRightButton.setBorderPainted(false);
@@ -278,7 +317,7 @@ public class GoGoGame extends JFrame{
 			}
 		});
 		add(charSelectRightButton);
-		
+
 		charSelectLeftButton.setVisible(false);
 		charSelectLeftButton.setBounds(20,250,60,60);
 		charSelectLeftButton.setBorderPainted(false);
@@ -301,11 +340,11 @@ public class GoGoGame extends JFrame{
 		});
 		add(charSelectLeftButton);
 		add(exitButton1);
-		
+
 		Music introMusic=new Music("ARRIVAL.MP3",true);
 		introMusic.start(); // 스레드 실행시작
-		
-		
+
+
 
 
 	}
@@ -358,5 +397,26 @@ public class GoGoGame extends JFrame{
 		else
 			--charSelectNum;
 		charSelect(charSelectNum);
+	}
+	class MyThread extends Thread {
+		public void run() {
+			try {
+				String response=input.readLine();
+				JLabel other=new JLabel(response);
+				other.setBounds(100,200,50,50);
+				add(other);
+
+			} catch (IOException e11) {
+				// TODO Auto-generated catch block
+				e11.printStackTrace();
+			}
+
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 }

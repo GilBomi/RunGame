@@ -26,11 +26,11 @@ public class goServer {
 		} finally {
 			ss.close();
 		}*/
-		ServerSocket ss=new ServerSocket(9003);
+		ServerSocket ss=new ServerSocket(9001);
 		System.out.println("서버 시작되었습니다.");
 		try {
-			Player player1=new Player(ss.accept(),'X');
-			Player player2=new Player(ss.accept(),'O');
+			Player player1=new Player(ss.accept());
+			Player player2=new Player(ss.accept());
 			player1.setOther(player2);
 			player2.setOther(player1);
 			player1.start();
@@ -97,12 +97,10 @@ class Player extends Thread {
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
-	char playerMark;
 	Player other;
 
-	public Player(Socket socket,char playerMark) {
+	public Player(Socket socket) {
 		this.socket=socket;
-		this.playerMark=playerMark;
 		try {
 			input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			output=new PrintWriter(socket.getOutputStream(),true);
@@ -114,7 +112,16 @@ class Player extends Thread {
 		this.other=other;	
 	}
 	public void run() {
+		String command;
+		try {
+			command=input.readLine();
 
+			if(command!=null)
+				other.output.println(command);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		System.out.println("연결 끊어짐");
 		try {
 			socket.close();
