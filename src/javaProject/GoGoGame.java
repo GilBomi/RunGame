@@ -10,8 +10,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -52,7 +56,8 @@ public class GoGoGame extends JFrame{
 	private boolean characterPage=false;
 	private Image characterSelect=new ImageIcon(Main.class.getResource("../image/chimmy.png")).getImage();
 	private Image nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
-	private Image characterFace;
+	private ImageIcon characterFace;
+	private JButton characterFaceButton;
 
 	private ImageIcon charSelectRightButtonImage = new ImageIcon(Main.class.getResource("../image/rightButton.png"));
 	private ImageIcon charSelectLefttButtonImage=new ImageIcon(Main.class.getResource("../image/leftButton.png"));
@@ -67,10 +72,14 @@ public class GoGoGame extends JFrame{
 	private String name;
 
 	private Socket socket;
-	private BufferedReader input;
-	private PrintWriter output;
+	private BufferedReader input2;
+	private PrintWriter output2;
+	private DataInputStream in; // 기초 자료형 읽기
+	private DataOutputStream out;
 	private int speed=0;
 	private int length=100;
+	private ObjectInputStream input; // 바이트 읽어오기
+	private ObjectOutputStream output; // 사진 보내기
 
 	public GoGoGame() throws UnknownHostException,IOException{
 		setUndecorated(true); // frame을 없애고
@@ -155,15 +164,35 @@ public class GoGoGame extends JFrame{
 				// goClient 생성자 메소드 내용
 				try {
 					socket = new Socket("localhost",9001);
-					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					output = new PrintWriter(socket.getOutputStream(),true);
+					input=new ObjectInputStream(socket.getInputStream());
+					output= new ObjectOutputStream(socket.getOutputStream());
+					//input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					//output=new PrintWriter(socket.getOutputStream(),true);
+					// in=new DataInputStream(socket.getInputStream()); 
+					// out=new DataOutputStream(socket.getOutputStream()); 
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				JLabel label=new JLabel(name);
-				label.setBounds(100,100,50+speed,50);
+				label.setBounds(100,100,50,50);
 				add(label);
+				
+				characterFaceButton=new JButton(characterFace);
+				characterFaceButton.setBounds(100,150,180,180);
+				characterFaceButton.setBorderPainted(false);
+				characterFaceButton.setContentAreaFilled(false);
+				characterFaceButton.setFocusPainted(false);
+				add(characterFaceButton);
+				try {
+					output.writeObject(name);
+					output.writeObject(characterFace);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+
 				addKeyListener(new KeyListener() { 
 					@Override
 					public void keyPressed(KeyEvent e) {
@@ -173,17 +202,22 @@ public class GoGoGame extends JFrame{
 						else 
 							speed=0;
 						length+=speed;
-						label.setBounds(length,100,50,50);
+						
+						/*try { 
+							out.writeInt(300);
+							
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						label.setBounds(300,100,50,50); */
 					}
 					@Override
 					public void keyReleased(KeyEvent e) {}
 					@Override
 					public void keyTyped(KeyEvent e) {}
 				});
-
-
-				output.println(name);
-
+				
 				(new MyThread()).start();
 				//client.start();
 			}
@@ -369,17 +403,17 @@ public class GoGoGame extends JFrame{
 		case 0: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Chimmy.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/chimmyFace.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/chimmyFace.png"));
 			break;
 		case 1: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/RJ.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/rjName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/rjFace.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/rjFace.png"));
 			break;
 		case 2:
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Koya.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/koyaName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/koyaFace.png")).getImage();
+			characterFace=new ImageIcon(Main.class.getResource("../image/koyaFace.png"));
 			break;
 		}
 	}
@@ -398,17 +432,45 @@ public class GoGoGame extends JFrame{
 			--charSelectNum;
 		charSelect(charSelectNum);
 	}
+
 	class MyThread extends Thread {
 		public void run() {
 			try {
-				String response=input.readLine();
-				JLabel other=new JLabel(response);
-				other.setBounds(100,200,50,50);
-				add(other);
+				String response=(String)input.readObject();
+				JLabel other;
+				if(response==null)
+					System.out.println("널이야");
+				if(response!=null) {
+					System.out.println("널 아님");
+					other=new JLabel(response);
+					other.setBounds(100,350,50,50);
+					add(other);
+				}
+				ImageIcon iIcon=(ImageIcon)input.readObject();
+				if(iIcon!=null) {
+					JButton otherFace=new JButton(iIcon);
+					otherFace.setBounds(100,400,180,180);
+					otherFace.setBorderPainted(false);
+					otherFace.setContentAreaFilled(false);
+					otherFace.setFocusPainted(false);
+					add(otherFace);
+				}
+				// int otherLength=in.readInt(); 
+				
+				/*while(true) {
+					otherLength=in.readInt();
+					other.setBounds(otherLength,200,50,50);
+					try {
+						Thread.sleep(200);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+				}*/
+				// add(other);
 
-			} catch (IOException e11) {
+			} catch (IOException | ClassNotFoundException e11) {
 				// TODO Auto-generated catch block
-				e11.printStackTrace();
+				System.out.println("aaaa");
 			}
 
 			try {

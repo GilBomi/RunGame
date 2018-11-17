@@ -1,11 +1,17 @@
 package javaProject;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.swing.ImageIcon;
 
 public class goServer {
 
@@ -94,16 +100,25 @@ class Player extends Thread {
 			}
 		}
 	}*/
-	Socket socket;
-	BufferedReader input;
-	PrintWriter output;
-	Player other;
+	private Socket socket;
+	private BufferedReader input2;
+	private PrintWriter output2;
+	private Player other;
+	private DataInputStream in; // 기초 자료형 읽기
+	private DataOutputStream out; 
+	private ObjectInputStream input;
+	private ObjectOutputStream output;
 
 	public Player(Socket socket) {
 		this.socket=socket;
 		try {
-			input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			output=new PrintWriter(socket.getOutputStream(),true);
+			//input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			//output=new PrintWriter(socket.getOutputStream(),true);
+			//in=new DataInputStream(socket.getInputStream()); 
+			//out=new DataOutputStream(socket.getOutputStream()); 
+			output= new ObjectOutputStream(socket.getOutputStream());
+			input=new ObjectInputStream(socket.getInputStream());
+			
 		} catch(IOException e) {
 			System.out.println("연결 끊어짐"+e);
 		}
@@ -114,11 +129,17 @@ class Player extends Thread {
 	public void run() {
 		String command;
 		try {
-			command=input.readLine();
+			command=(String)input.readObject();
+			if(command!=null) 
+				other.output.writeObject(command);
+			
+			ImageIcon iIcon=(ImageIcon)input.readObject();
+			if(iIcon!=null)
+				other.output.writeObject(iIcon);
+			// int otherLength=in.readInt(); 
+			// other.out.writeInt(otherLength); 
 
-			if(command!=null)
-				other.output.println(command);
-		} catch (IOException e1) {
+		} catch (IOException | ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
