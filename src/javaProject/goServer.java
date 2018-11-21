@@ -32,7 +32,7 @@ public class goServer {
 		} finally {
 			ss.close();
 		}*/
-		ServerSocket ss=new ServerSocket(9002);
+		ServerSocket ss=new ServerSocket(9003);
 		System.out.println("서버 시작되었습니다.");
 		try {
 			Player player1=new Player(ss.accept());
@@ -101,11 +101,7 @@ class Player extends Thread {
 		}
 	}*/
 	private Socket socket;
-	private BufferedReader input2;
-	private PrintWriter output2;
 	private Player other;
-	private DataInputStream in; // 기초 자료형 읽기
-	private DataOutputStream out; 
 	private BufferedReader input;
 	private PrintWriter output;
 
@@ -118,6 +114,7 @@ class Player extends Thread {
 			//out=new DataOutputStream(socket.getOutputStream()); 
 			//output= new ObjectOutputStream(socket.getOutputStream());
 			//input=new ObjectInputStream(socket.getInputStream());
+			output.println("PRINT 접속했습니다. 상대방을 기다리고 있습니다.");
 
 		} catch(IOException e) {
 			System.out.println("연결 끊어짐"+e);
@@ -129,21 +126,32 @@ class Player extends Thread {
 	public void run() {
 		String command;
 		try {
+			output.println("PRINT 상대방이 접속했습니다. 게임 시작!");
+			output.println("PRINT 앞으로 움직이려면 스페이스 바를 누르세요.");
 			while ((command = input.readLine()) != null) { 
 				//command=input.readLine();
 				if(command.startsWith("SET"))
-						other.output.println(command);
+					other.output.println(command);
+				else if(command.startsWith("MOVE")) {
+					int lastIndex=command.lastIndexOf(" ");
+					if(Integer.parseInt(command.substring(lastIndex+1))==880) {
+						System.out.println("880 됨");
+						other.output.println("RESULT 졌습니다. 다음엔 이길 수 있을거에요.");
+						output.println("RESULT 이겼습니다! 축하합니다!");
+						
+						output.println("END 게임을 종료합니다.");
+						other.output.println("END 게임을 종료합니다.");
+					}
+					else 
+						other.output.println("OTHER "+command.substring(5));
+				}
+
 			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("서버의 run에서 오류");
 		}
-
-
-		// int otherLength=in.readInt(); 
-		// other.out.writeInt(otherLength); 
-
 
 		System.out.println("연결 끊어짐");
 		try {

@@ -10,12 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -24,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 
@@ -72,14 +69,12 @@ public class GoGoGame extends JFrame{
 	private String name;
 
 	private Socket socket;
-	private BufferedReader input2;
-	private PrintWriter output2;
-	private DataInputStream in; // 기초 자료형 읽기
-	private DataOutputStream out;
 	private int speed=0;
-	private int length=100;
+	private int length1=50;
+	private int length2=10;
 	private BufferedReader input; // 바이트 읽어오기
-	private PrintWriter output; // 사진 보내기
+	private PrintWriter output; 
+	JTextArea tArea;
 
 	public GoGoGame() throws UnknownHostException,IOException{
 		setUndecorated(true); // frame을 없애고
@@ -162,13 +157,17 @@ public class GoGoGame extends JFrame{
 					// name은 문자열
 				}
 				jtname.setVisible(false);
-				/*JLabel t=new JLabel("aaa");
-				t.setBounds(100,100,50,50);
-				add(t);*/
-
+				//Border border = BorderFactory.createLineBorder(Color.PINK); 
+				tArea=new JTextArea(7,300);
+				tArea.setBounds(300,500,500,200);
+				tArea.setEditable(false);
+				tArea.setVisible(true);
+				/*tArea.setBorder(BorderFactory.createCompoundBorder(border, 
+					      BorderFactory.createEmptyBorder(10, 10, 10, 10)));*/
+				add(tArea);
 				// goClient 생성자 메소드 내용
 				try {
-					socket = new Socket("localhost",9002);
+					socket = new Socket("localhost",9003);
 					//input=new ObjectInputStream(socket.getInputStream());
 					//output= new ObjectOutputStream(socket.getOutputStream());
 					input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -180,11 +179,11 @@ public class GoGoGame extends JFrame{
 					System.out.println("클라이언트 소켓 문제");
 				}
 				JLabel label=new JLabel(name);
-				label.setBounds(100,100,50,50);
+				label.setBounds(50,60,100,50);
 				add(label);
 
 				characterFaceButton=new JButton(new ImageIcon(Main.class.getResource(characterFace)));
-				characterFaceButton.setBounds(100,150,180,180);
+				characterFaceButton.setBounds(10,80,180,180);
 				characterFaceButton.setBorderPainted(false);
 				characterFaceButton.setContentAreaFilled(false);
 				characterFaceButton.setFocusPainted(false);
@@ -195,30 +194,52 @@ public class GoGoGame extends JFrame{
 				addKeyListener(new KeyListener() { 
 					@Override
 					public void keyPressed(KeyEvent e) {
-						if(e.getKeyChar()==' ') {
+					}
+					@Override
+					public void keyReleased(KeyEvent e) {
+						if(e.getKeyCode() == KeyEvent.VK_SPACE) {
 							speed=10;
 						}
 						else 
 							speed=0;
-						length+=speed;
-
-						/*try { 
-							out.writeInt(300);
-
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+						
+						if(length2!=880) {
+							length1+=speed;
+							length2+=speed;
+							label.setBounds(length1,60,100,50);
+							characterFaceButton.setBounds(length2,80,180,180);
 						}
-						label.setBounds(300,100,50,50); */
+						output.println("MOVE "+length1+" "+length2);
+						System.out.println(length1+" "+length2);
 					}
-					@Override
-					public void keyReleased(KeyEvent e) {}
 					@Override
 					public void keyTyped(KeyEvent e) {}
 				});
-
-				//characterFaceButton.setBounds(length,150,180,180);
-				//label.setBounds(length,100,50,50);
+				//characterFaceButton.addKeyListener(key);
+				//label.addKeyListener(key);
+				requestFocus();
+				setFocusable(true);
+				/*
+				KeyAdapter keyAdapter=new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent e) {
+						if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+							speed=10;
+						}
+						else 
+							speed=0;
+						
+						if(length2!=880) {
+							length1+=speed;
+							length2+=speed;
+							label.setBounds(length1,60,100,50);
+							characterFaceButton.setBounds(length2,80,180,180);
+						}
+						output.println("MOVE "+length1+" "+length2);
+						System.out.println(length1+" "+length2);
+					}
+				};
+				addKeyListener(keyAdapter);*/
 
 				(new MyThread()).start();
 				//client.start();
@@ -379,10 +400,6 @@ public class GoGoGame extends JFrame{
 
 		Music introMusic=new Music("ARRIVAL.MP3",true);
 		introMusic.start(); // 스레드 실행시작
-
-
-
-
 	}
 	public void paint(Graphics g) { // // 이중 버퍼링기법(이미지 전환하면 화면 깜빡임이 없고 부드럽게 하기 위해서)
 		screenImage = createImage(1080, 715);
@@ -440,28 +457,42 @@ public class GoGoGame extends JFrame{
 			String command;
 			String otherName;
 			String otherFace;
+			JLabel otherName2=null;
+			JButton otherFace2=null;
 			try {
-				
+
 				while (( command= input.readLine()) != null) {
+
 					if(command.startsWith("SET")) {
 						int last=command.lastIndexOf("../image/");
 						otherName=command.substring(4,last);
 						otherFace=command.substring(last);
-						JLabel otherName2=new JLabel(otherName);
-						otherName2.setBounds(100,350,50,50);
+						otherName2=new JLabel(otherName);
+						otherName2.setBounds(50,300,100,50);
 						add(otherName2);
 
-						JButton otherFace2=new JButton(new ImageIcon(Main.class.getResource(otherFace)));
-						otherFace2.setBounds(100,400,180,180);
+						otherFace2=new JButton(new ImageIcon(Main.class.getResource(otherFace)));
+						otherFace2.setBounds(10,320,180,180);
 						otherFace2.setBorderPainted(false);
 						otherFace2.setContentAreaFilled(false);
 						otherFace2.setFocusPainted(false);
 						add(otherFace2);
 					}
-					try {
-						Thread.sleep(200);
-					} catch(InterruptedException e) {
-						System.out.println("sleep에서 오류");
+					else if(command.startsWith("PRINT")) 
+						tArea.append(command.substring(6)+"\n");
+					else if(command.startsWith("OTHER")) {
+						int lastIndex=command.lastIndexOf(" ");
+						int otherNameLength=Integer.parseInt(command.substring(6,lastIndex));
+						int otherFaceLength=Integer.parseInt(command.substring(lastIndex+1));
+						otherName2.setBounds(otherNameLength,300,100,50);
+						otherFace2.setBounds(otherFaceLength, 320, 180, 180);
+					}
+					else if(command.startsWith("RESULT")) 
+						tArea.append(command.substring(7)+"\n");
+					else if(command.startsWith("END")) { 
+						tArea.append(command.substring(4)+"\n");
+						
+						break;
 					}
 				}
 			} catch (IOException e) {
