@@ -56,7 +56,7 @@ public class GoGoGame extends JFrame{
 	private boolean characterPage=false;
 	private Image characterSelect=new ImageIcon(Main.class.getResource("../image/chimmy.png")).getImage();
 	private Image nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
-	private ImageIcon characterFace;
+	private String characterFace;
 	private JButton characterFaceButton;
 
 	private ImageIcon charSelectRightButtonImage = new ImageIcon(Main.class.getResource("../image/rightButton.png"));
@@ -66,7 +66,7 @@ public class GoGoGame extends JFrame{
 	private ImageIcon charSelectRightButtonPressed=new ImageIcon(Main.class.getResource("../image/rightButtonPressed.png"));
 	private ImageIcon charSelectLeftButtonPressed=new ImageIcon(Main.class.getResource("../image/leftButtonPressed.png"));
 	private int mouseX, mouseY;
-	private int charSelectNum;
+	private int charSelectNum=0;
 
 	private JTextField jtname;
 	private String name;
@@ -78,8 +78,8 @@ public class GoGoGame extends JFrame{
 	private DataOutputStream out;
 	private int speed=0;
 	private int length=100;
-	private ObjectInputStream input; // 바이트 읽어오기
-	private ObjectOutputStream output; // 사진 보내기
+	private BufferedReader input; // 바이트 읽어오기
+	private PrintWriter output; // 사진 보내기
 
 	public GoGoGame() throws UnknownHostException,IOException{
 		setUndecorated(true); // frame을 없애고
@@ -139,6 +139,11 @@ public class GoGoGame extends JFrame{
 		});
 		add(menuBar);
 
+		if(charSelectNum==0) {
+			characterSelect=new ImageIcon(Main.class.getResource("../image/Chimmy.png")).getImage();
+			nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
+			characterFace="../image/chimmyFace.png";
+		}
 		/*이 버튼은 이미지 만들어서 대체하기, 네트워크 보기 위해서 임시로 만듦*/
 		JButton test=new JButton("게임 시작");
 		test.setBounds(700,500,200,100);
@@ -163,35 +168,29 @@ public class GoGoGame extends JFrame{
 
 				// goClient 생성자 메소드 내용
 				try {
-					socket = new Socket("localhost",9001);
-					input=new ObjectInputStream(socket.getInputStream());
-					output= new ObjectOutputStream(socket.getOutputStream());
-					//input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					//output=new PrintWriter(socket.getOutputStream(),true);
+					socket = new Socket("localhost",9002);
+					//input=new ObjectInputStream(socket.getInputStream());
+					//output= new ObjectOutputStream(socket.getOutputStream());
+					input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					output=new PrintWriter(socket.getOutputStream(),true);
 					// in=new DataInputStream(socket.getInputStream()); 
 					// out=new DataOutputStream(socket.getOutputStream()); 
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					System.out.println("클라이언트 소켓 문제");
 				}
 				JLabel label=new JLabel(name);
 				label.setBounds(100,100,50,50);
 				add(label);
-				
-				characterFaceButton=new JButton(characterFace);
+
+				characterFaceButton=new JButton(new ImageIcon(Main.class.getResource(characterFace)));
 				characterFaceButton.setBounds(100,150,180,180);
 				characterFaceButton.setBorderPainted(false);
 				characterFaceButton.setContentAreaFilled(false);
 				characterFaceButton.setFocusPainted(false);
 				add(characterFaceButton);
-				try {
-					output.writeObject(name);
-					output.writeObject(characterFace);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
+
+				output.println("SET "+name+characterFace);
 
 				addKeyListener(new KeyListener() { 
 					@Override
@@ -202,10 +201,10 @@ public class GoGoGame extends JFrame{
 						else 
 							speed=0;
 						length+=speed;
-						
+
 						/*try { 
 							out.writeInt(300);
-							
+
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -217,7 +216,10 @@ public class GoGoGame extends JFrame{
 					@Override
 					public void keyTyped(KeyEvent e) {}
 				});
-				
+
+				//characterFaceButton.setBounds(length,150,180,180);
+				//label.setBounds(length,100,50,50);
+
 				(new MyThread()).start();
 				//client.start();
 			}
@@ -403,17 +405,17 @@ public class GoGoGame extends JFrame{
 		case 0: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Chimmy.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/chimmyName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/chimmyFace.png"));
+			characterFace="../image/rjFace.png";
 			break;
 		case 1: 
 			characterSelect=new ImageIcon(Main.class.getResource("../image/RJ.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/rjName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/rjFace.png"));
+			characterFace="../image/rjFace.png";
 			break;
 		case 2:
 			characterSelect=new ImageIcon(Main.class.getResource("../image/Koya.png")).getImage();
 			nameSelect=new ImageIcon(Main.class.getResource("../image/koyaName.png")).getImage();
-			characterFace=new ImageIcon(Main.class.getResource("../image/koyaFace.png"));
+			characterFace="../image/koyaFace.png";
 			break;
 		}
 	}
@@ -435,42 +437,36 @@ public class GoGoGame extends JFrame{
 
 	class MyThread extends Thread {
 		public void run() {
+			String command;
+			String otherName;
+			String otherFace;
 			try {
-				String response=(String)input.readObject();
-				JLabel other;
-				if(response==null)
-					System.out.println("널이야");
-				if(response!=null) {
-					System.out.println("널 아님");
-					other=new JLabel(response);
-					other.setBounds(100,350,50,50);
-					add(other);
-				}
-				ImageIcon iIcon=(ImageIcon)input.readObject();
-				if(iIcon!=null) {
-					JButton otherFace=new JButton(iIcon);
-					otherFace.setBounds(100,400,180,180);
-					otherFace.setBorderPainted(false);
-					otherFace.setContentAreaFilled(false);
-					otherFace.setFocusPainted(false);
-					add(otherFace);
-				}
-				// int otherLength=in.readInt(); 
 				
-				/*while(true) {
-					otherLength=in.readInt();
-					other.setBounds(otherLength,200,50,50);
+				while (( command= input.readLine()) != null) {
+					if(command.startsWith("SET")) {
+						int last=command.lastIndexOf("../image/");
+						otherName=command.substring(4,last);
+						otherFace=command.substring(last);
+						JLabel otherName2=new JLabel(otherName);
+						otherName2.setBounds(100,350,50,50);
+						add(otherName2);
+
+						JButton otherFace2=new JButton(new ImageIcon(Main.class.getResource(otherFace)));
+						otherFace2.setBounds(100,400,180,180);
+						otherFace2.setBorderPainted(false);
+						otherFace2.setContentAreaFilled(false);
+						otherFace2.setFocusPainted(false);
+						add(otherFace2);
+					}
 					try {
 						Thread.sleep(200);
 					} catch(InterruptedException e) {
-						e.printStackTrace();
+						System.out.println("sleep에서 오류");
 					}
-				}*/
-				// add(other);
-
-			} catch (IOException | ClassNotFoundException e11) {
+				}
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				System.out.println("aaaa");
+				System.out.println("클라이언트 run에서 오류");
 			}
 
 			try {

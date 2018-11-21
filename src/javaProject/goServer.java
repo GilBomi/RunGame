@@ -32,7 +32,7 @@ public class goServer {
 		} finally {
 			ss.close();
 		}*/
-		ServerSocket ss=new ServerSocket(9001);
+		ServerSocket ss=new ServerSocket(9002);
 		System.out.println("서버 시작되었습니다.");
 		try {
 			Player player1=new Player(ss.accept());
@@ -106,19 +106,19 @@ class Player extends Thread {
 	private Player other;
 	private DataInputStream in; // 기초 자료형 읽기
 	private DataOutputStream out; 
-	private ObjectInputStream input;
-	private ObjectOutputStream output;
+	private BufferedReader input;
+	private PrintWriter output;
 
 	public Player(Socket socket) {
 		this.socket=socket;
 		try {
-			//input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			//output=new PrintWriter(socket.getOutputStream(),true);
+			input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			output=new PrintWriter(socket.getOutputStream(),true);
 			//in=new DataInputStream(socket.getInputStream()); 
 			//out=new DataOutputStream(socket.getOutputStream()); 
-			output= new ObjectOutputStream(socket.getOutputStream());
-			input=new ObjectInputStream(socket.getInputStream());
-			
+			//output= new ObjectOutputStream(socket.getOutputStream());
+			//input=new ObjectInputStream(socket.getInputStream());
+
 		} catch(IOException e) {
 			System.out.println("연결 끊어짐"+e);
 		}
@@ -129,25 +129,29 @@ class Player extends Thread {
 	public void run() {
 		String command;
 		try {
-			command=(String)input.readObject();
-			if(command!=null) 
-				other.output.writeObject(command);
-			
-			ImageIcon iIcon=(ImageIcon)input.readObject();
-			if(iIcon!=null)
-				other.output.writeObject(iIcon);
-			// int otherLength=in.readInt(); 
-			// other.out.writeInt(otherLength); 
+			while ((command = input.readLine()) != null) { 
+				//command=input.readLine();
+				if(command.startsWith("SET"))
+						other.output.println(command);
+			}
 
-		} catch (IOException | ClassNotFoundException e1) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			System.out.println("서버의 run에서 오류");
 		}
+
+
+		// int otherLength=in.readInt(); 
+		// other.out.writeInt(otherLength); 
+
+
 		System.out.println("연결 끊어짐");
 		try {
 			socket.close();
 		}catch(IOException e) {
+			System.out.println("소켓 못닫음");
 		}
 	}
 }
+
 
