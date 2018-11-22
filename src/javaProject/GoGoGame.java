@@ -16,12 +16,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 
 
@@ -62,6 +64,8 @@ public class GoGoGame extends JFrame{
 	private JButton charSelectLeftButton = new JButton(charSelectLefttButtonImage);
 	private ImageIcon charSelectRightButtonPressed=new ImageIcon(Main.class.getResource("../image/rightButtonPressed.png"));
 	private ImageIcon charSelectLeftButtonPressed=new ImageIcon(Main.class.getResource("../image/leftButtonPressed.png"));
+	private JButton gameStartButton=new JButton(new ImageIcon(Main.class.getResource("../image/gameStartImage.png")));
+	private Image nameSetImage=new ImageIcon(Main.class.getResource("../image/nameSetImage.png")).getImage();
 	private int mouseX, mouseY;
 	private int charSelectNum=0;
 
@@ -75,6 +79,7 @@ public class GoGoGame extends JFrame{
 	private BufferedReader input; // 바이트 읽어오기
 	private PrintWriter output; 
 	JTextArea tArea;
+	KeyListener kListener;
 
 	public GoGoGame() throws UnknownHostException,IOException{
 		setUndecorated(true); // frame을 없애고
@@ -140,30 +145,41 @@ public class GoGoGame extends JFrame{
 			characterFace="../image/chimmyFace.png";
 		}
 		/*이 버튼은 이미지 만들어서 대체하기, 네트워크 보기 위해서 임시로 만듦*/
-		JButton test=new JButton("게임 시작");
-		test.setBounds(700,500,200,100);
-		test.setVisible(false);
-		add(test);
-		test.addMouseListener(new MouseAdapter() {
+		
+		gameStartButton.setBounds(650,500,300,100);
+		gameStartButton.setVisible(false);
+		add(gameStartButton);
+		gameStartButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				gameStartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				gameStartButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+			
 			public void mousePressed(MouseEvent e) {
-				test.setVisible(false);
+				Music buttonEnteredMusic = new Music("mouseClick.mp3", false);
+				gameStartButton.setVisible(false);
 				charSelectRightButton.setVisible(false);
 				charSelectLeftButton.setVisible(false);
 				characterPage=false;
 
-				if(e.getSource()==test || e.getSource()==jtname) {
+				if(e.getSource()==gameStartButton || e.getSource()==jtname) {
 					name=jtname.getText();
 					// jtname은 텍스트 필드
 					// name은 문자열
 				}
 				jtname.setVisible(false);
 				//Border border = BorderFactory.createLineBorder(Color.PINK); 
+				Border linebor = BorderFactory.createLineBorder(new Color(0xF2A6A6), 5);
 				tArea=new JTextArea(7,300);
 				tArea.setBounds(300,500,500,200);
 				tArea.setEditable(false);
 				tArea.setVisible(true);
-				/*tArea.setBorder(BorderFactory.createCompoundBorder(border, 
-					      BorderFactory.createEmptyBorder(10, 10, 10, 10)));*/
+				tArea.setBorder(BorderFactory.createCompoundBorder(linebor, 
+					      BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 				add(tArea);
 				// goClient 생성자 메소드 내용
 				try {
@@ -191,7 +207,7 @@ public class GoGoGame extends JFrame{
 
 				output.println("SET "+name+characterFace);
 
-				addKeyListener(new KeyListener() { 
+				kListener=new KeyListener() { 
 					@Override
 					public void keyPressed(KeyEvent e) {
 					}
@@ -214,32 +230,10 @@ public class GoGoGame extends JFrame{
 					}
 					@Override
 					public void keyTyped(KeyEvent e) {}
-				});
-				//characterFaceButton.addKeyListener(key);
-				//label.addKeyListener(key);
-				requestFocus();
-				setFocusable(true);
-				/*
-				KeyAdapter keyAdapter=new KeyAdapter() {
-					@Override
-					public void keyReleased(KeyEvent e) {
-						if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-							speed=10;
-						}
-						else 
-							speed=0;
-						
-						if(length2!=880) {
-							length1+=speed;
-							length2+=speed;
-							label.setBounds(length1,60,100,50);
-							characterFaceButton.setBounds(length2,80,180,180);
-						}
-						output.println("MOVE "+length1+" "+length2);
-						System.out.println(length1+" "+length2);
-					}
 				};
-				addKeyListener(keyAdapter);*/
+				addKeyListener(kListener);
+				requestFocus(); // 키 이벤트는 이것도 같이 써줘야 작동함 
+				setFocusable(true); // 키 이벤트는 이것도 같이 써줘야 작동함 
 
 				(new MyThread()).start();
 				//client.start();
@@ -271,7 +265,7 @@ public class GoGoGame extends JFrame{
 				characterPage=true;
 				jtname.setVisible(true);
 				/*임시로 만든 버튼, 나중에 이미지로 대체하기*/
-				test.setVisible(true);
+				gameStartButton.setVisible(true);
 
 			};
 		});
@@ -279,7 +273,7 @@ public class GoGoGame extends JFrame{
 
 		jtname = new JTextField(10);
 		jtname.setVisible(false);
-		jtname.setBounds(640, 180, 280, 35);
+		jtname.setBounds(650, 200, 280, 35);
 		add(jtname);
 
 		descriptionButton.setBounds(100,300,300,100); // 설명버튼
@@ -413,6 +407,7 @@ public class GoGoGame extends JFrame{
 		if(characterPage) {
 			g.drawImage(nameSelect, 80,70,null);
 			g.drawImage(characterSelect,80,150,null);
+			g.drawImage(nameSetImage,600,100,null);
 		}
 		paintComponents(g);
 		this.repaint();
@@ -491,6 +486,7 @@ public class GoGoGame extends JFrame{
 						tArea.append(command.substring(7)+"\n");
 					else if(command.startsWith("END")) { 
 						tArea.append(command.substring(4)+"\n");
+						removeKeyListener(kListener);
 						
 						break;
 					}
