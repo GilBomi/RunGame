@@ -119,6 +119,7 @@ class Player extends Thread {
 	}
 	public void run() {
 		String command;
+		
 		try {
 			output.println("PRINT 상대방이 접속했습니다. 게임 시작!");
 			output.println("PRINT 앞으로 움직이려면 스페이스 바를 누르세요.");

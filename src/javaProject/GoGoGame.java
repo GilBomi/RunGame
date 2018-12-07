@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -197,7 +198,8 @@ public class GoGoGame extends JFrame{
 				JLabel label=new JLabel(name);
 				label.setBounds(50,60,100,50);
 				add(label);
-
+				
+				goDB db=new goDB();
 				characterFaceButton=new JButton(new ImageIcon(Main.class.getResource(characterFace)));
 				characterFaceButton.setBounds(10,80,180,180);
 				characterFaceButton.setBorderPainted(false);
@@ -227,6 +229,13 @@ public class GoGoGame extends JFrame{
 						}
 						output.println("MOVE "+length1+" "+length2);
 						System.out.println(length1+" "+length2);
+						if(length1==300)
+							try {
+								db.question();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 					}
 					@Override
 					public void keyTyped(KeyEvent e) {}
