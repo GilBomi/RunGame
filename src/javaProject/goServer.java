@@ -122,7 +122,7 @@ class Player extends Thread {
 		
 		try {
 			output.println("PRINT 상대방이 접속했습니다. 게임 시작!");
-			output.println("PRINT 앞으로 움직이려면 스페이스 바를 누르세요.");
+			output.println("PRINT 앞으로 움직이려면 →키를 누르세요.");
 			while ((command = input.readLine()) != null) { 
 				//command=input.readLine();
 				if(command.startsWith("SET"))
@@ -140,6 +140,9 @@ class Player extends Thread {
 					else 
 						other.output.println("OTHER "+command.substring(5));
 				}
+				else if(command.startsWith("QUESTION1")) 
+					other.output.println(command);
+				
 
 			}
 

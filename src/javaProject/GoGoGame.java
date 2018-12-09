@@ -22,8 +22,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
 
@@ -146,7 +148,7 @@ public class GoGoGame extends JFrame{
 			characterFace="../image/chimmyFace.png";
 		}
 		/*이 버튼은 이미지 만들어서 대체하기, 네트워크 보기 위해서 임시로 만듦*/
-		
+
 		gameStartButton.setBounds(650,500,300,100);
 		gameStartButton.setVisible(false);
 		add(gameStartButton);
@@ -159,7 +161,7 @@ public class GoGoGame extends JFrame{
 			public void mouseExited(MouseEvent e) {
 				gameStartButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
-			
+
 			public void mousePressed(MouseEvent e) {
 				Music buttonEnteredMusic = new Music("mouseClick.mp3", false);
 				gameStartButton.setVisible(false);
@@ -176,12 +178,23 @@ public class GoGoGame extends JFrame{
 				//Border border = BorderFactory.createLineBorder(Color.PINK); 
 				Border linebor = BorderFactory.createLineBorder(new Color(0xF2A6A6), 5);
 				tArea=new JTextArea(7,300);
+				
+				
 				tArea.setBounds(300,500,500,200);
 				tArea.setEditable(false);
 				tArea.setVisible(true);
+				JScrollPane scrollPane=new JScrollPane(tArea);
+				
+				scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
 				tArea.setBorder(BorderFactory.createCompoundBorder(linebor, 
-					      BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+						BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+				//add(tArea);
+				//add(scrollPane);
 				add(tArea);
+				//getContentPane().add(scrollPane);
+				
+				
 				// goClient 생성자 메소드 내용
 				try {
 					socket = new Socket("localhost",9003);
@@ -198,7 +211,7 @@ public class GoGoGame extends JFrame{
 				JLabel label=new JLabel(name);
 				label.setBounds(50,60,100,50);
 				add(label);
-				
+
 				goDB db=new goDB();
 				characterFaceButton=new JButton(new ImageIcon(Main.class.getResource(characterFace)));
 				characterFaceButton.setBounds(10,80,180,180);
@@ -215,12 +228,12 @@ public class GoGoGame extends JFrame{
 					}
 					@Override
 					public void keyReleased(KeyEvent e) {
-						if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+						if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 							speed=10;
 						}
 						else 
 							speed=0;
-						
+
 						if(length2!=880) {
 							length1+=speed;
 							length2+=speed;
@@ -229,13 +242,27 @@ public class GoGoGame extends JFrame{
 						}
 						output.println("MOVE "+length1+" "+length2);
 						System.out.println(length1+" "+length2);
-						if(length1==300)
-							try {
-								db.question();
-							} catch (SQLException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+						if(length1==300) {
+							int u = 0;
+							while(u!=1) {
+								try {
+									u=db.question();
+									if(u!=1) {
+										tArea.append("첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.\n");
+										output.println("QUESTION1 상대방이 첫번째 문제를 틀렸렸습니다. 다시 풀고 있습니다.");
+									}
+									else {
+										tArea.append("첫번째 문제를 맞췄습니다.\n");
+										output.println("QUESTION1 상대방이 첫번째 문제를 맞췄습니다.");	
+									}
+										
+								} catch (SQLException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 							}
+						}
+
 					}
 					@Override
 					public void keyTyped(KeyEvent e) {}
@@ -493,12 +520,14 @@ public class GoGoGame extends JFrame{
 					}
 					else if(command.startsWith("RESULT")) 
 						tArea.append(command.substring(7)+"\n");
+					else if(command.startsWith("QUESTION1"))
+						tArea.append(command.substring(10)+"\n");
 					else if(command.startsWith("END")) { 
 						tArea.append(command.substring(4)+"\n");
 						removeKeyListener(kListener);
-						
 						break;
 					}
+					
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

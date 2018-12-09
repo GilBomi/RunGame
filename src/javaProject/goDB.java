@@ -47,7 +47,7 @@ public class goDB {
 			}
 		}*/
 	}
-	public void question() throws SQLException {
+	public int question() throws SQLException {
 		// TODO Auto-generated method stub
 
 		outterWhile:while(true) { // 이중 while문에서 가장 바깥쪽 while문 탈출 위해 라벨을 붙임 
@@ -62,18 +62,20 @@ public class goDB {
 					System.out.println(pp); // 예를 누르면 무조건 0, 아니요를 누르면 1이 반환됨, 끄기를 누르면 -1이 반환됨
 					if(pp==Integer.parseInt(rs.getString(3))) {
 						System.out.println("맞았습니다.");
-						break outterWhile; // 외부 while문 탈출
+						return 1; // 외부 while문 탈출
 					}
 					else if(pp==-1)
-						continue outterWhile; // 외부 while문 다시 반복
+						return 0; // 외부 while문 다시 반복
 					else {
 						System.out.println("틀렸습니다");
-						continue outterWhile;
+						return 0;
 					}
 				}
 				kk++;
 			}
+			
 		}
+		
 	}
 
 }
