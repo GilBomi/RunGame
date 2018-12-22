@@ -15,7 +15,7 @@ public class goDB {
 	private static ResultSet rs;
 	private static int n; // 디비 테이블의 레코드의 크기
 
-	public goDB() {
+	public goDB(String sql) {
 		con=null; // db 연결 설정하는 인터페이스
 		String name="org.gjt.mm.mysql.Driver";
 		String url="jdbc:mysql://localhost:3306/javaproject?useSSL=false&useUnicode=true&characterEncoding=euckr";
@@ -26,7 +26,7 @@ public class goDB {
 			Class.forName(name); // jdbc 드라이버 적재(초석)
 			con=DriverManager.getConnection(url, user, password); // 데이터베이스를 jdbc와 연결
 			System.out.println("연결 성공!"); 
-			sql="select*from question";
+			this.sql=sql;
 			pstmt=con.prepareStatement(sql);
 			rs=pstmt.executeQuery();
 			n=0; 

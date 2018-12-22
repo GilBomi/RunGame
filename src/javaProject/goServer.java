@@ -108,7 +108,7 @@ class Player extends Thread {
 			//out=new DataOutputStream(socket.getOutputStream()); 
 			//output= new ObjectOutputStream(socket.getOutputStream());
 			//input=new ObjectInputStream(socket.getInputStream());
-			output.println("PRINT 접속했습니다. 상대방을 기다리고 있습니다.");
+			output.println("PRE 접속했습니다. 상대방을 기다리고 있습니다.");
 
 		} catch(IOException e) {
 			System.out.println("연결 끊어짐"+e);
@@ -119,30 +119,37 @@ class Player extends Thread {
 	}
 	public void run() {
 		String command;
-		
+
 		try {
-			output.println("PRINT 상대방이 접속했습니다. 게임 시작!");
-			output.println("PRINT 앞으로 움직이려면 →키를 누르세요.");
 			while ((command = input.readLine()) != null) { 
 				//command=input.readLine();
-				if(command.startsWith("SET"))
+				if(command.startsWith("SET")) {
 					other.output.println(command);
+					other.output.println("PRINT 님이 접속했습니다. 게임 시작!");
+					other.output.println("PRE 앞으로 움직이려면 →키를 누르세요.");
+				}
 				else if(command.startsWith("MOVE")) {
 					int lastIndex=command.lastIndexOf(" ");
 					if(Integer.parseInt(command.substring(lastIndex+1))==880) {
 						System.out.println("880 됨");
-						other.output.println("RESULT ***졌습니다. 다음엔 이길 수 있을거에요.***");
-						output.println("RESULT ***이겼습니다! 축하합니다!***");
-						
-						output.println("END 게임을 종료합니다.");
-						other.output.println("END 게임을 종료합니다.");
+						//other.output.println("RESULT 님이 졌습니다.");
+						output.println("RESULT 님이 이겼습니다!");
 					}
 					else 
 						other.output.println("OTHER "+command.substring(5));
 				}
+				else if(command.startsWith("FINAL")) {
+					other.output.println(command);
+					output.println(command);
+					output.println("END 게임을 종료합니다.");
+					other.output.println("END 게임을 종료합니다.");
+				}
 				else if(command.startsWith("QUESTION1")) 
 					other.output.println(command);
-				
+				else if(command.startsWith("MESSAGE")) {
+					other.output.println(command);
+					output.println(command);
+				}
 
 			}
 

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -17,6 +18,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 
+import javax.print.attribute.standard.MediaSize.Other;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -25,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
 
 
@@ -179,12 +180,6 @@ public class GoGoGame extends JFrame{
 				Border linebor = BorderFactory.createLineBorder(new Color(0xF2A6A6), 5);
 				tArea=new JTextArea(7,300);
 
-				JTextField tField=new JTextField(200);
-				tField.setBounds(300, 650, 500, 25);
-				tField.setVisible(true);
-				
-				add(tField);
-				
 				//tArea.setBounds(300,400,500,200);
 				tArea.setEditable(false);
 				tArea.setVisible(true);
@@ -198,6 +193,35 @@ public class GoGoGame extends JFrame{
 				add(scrollPane);
 				//add(tArea);
 				//getContentPane().add(scrollPane);
+
+				JTextField tField=new JTextField(200);
+				tField.setBounds(300, 650, 500, 25);
+				tField.setVisible(true);
+				tField.addKeyListener(new KeyAdapter() {
+					@Override
+					public void keyReleased(KeyEvent e) {
+						int keycode=e.getKeyCode();
+						if(keycode==KeyEvent.VK_ENTER) {
+							output.println("MESSAGE "+name+" :"+tField.getText());
+							tField.selectAll(); // 텍스트 필드 안의 문자들 없애주려고
+							tField.replaceSelection(""); // 텍스트 필드 안의 문자들 없애주려고
+						} else if(keycode==KeyEvent.VK_RIGHT) {
+							//tField.requestFocus(false);
+							tField.setFocusable(false); 
+						}/* else if(keycode!=KeyEvent.VK_RIGHT) {
+							tField.requestFocus(true);
+							tField.setFocusable(true); 
+						}*/
+					}
+				});
+				add(tField);
+				tField.addMouseListener(new MouseAdapter() { // 키보드 ->를 누르면 텍스트 필드가 비활성화되는데 이걸 풀기 위해서 텍스트 필드를 클릭하면 다시 활성화되도록 함
+					@Override
+					public void mouseReleased(MouseEvent e) {
+						tField.setFocusable(true); 
+					}
+				});
+
 
 
 				// goClient 생성자 메소드 내용
@@ -217,7 +241,7 @@ public class GoGoGame extends JFrame{
 				label.setBounds(50,60,100,50);
 				add(label);
 
-				goDB db=new goDB();
+				//goDB db=new goDB();
 				characterFaceButton=new JButton(new ImageIcon(Main.class.getResource(characterFace)));
 				characterFaceButton.setBounds(10,80,180,180);
 				characterFaceButton.setBorderPainted(false);
@@ -249,18 +273,41 @@ public class GoGoGame extends JFrame{
 						System.out.println(length1+" "+length2);
 						if(length1==300) {
 							int u = 0;
+							goDB db=new goDB("select*from question");
 							while(u!=1) {
 								try {
 									u=db.question();
 									if(u!=1) {
-										tArea.append("첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.\n");
+										tArea.append(name+"님이 첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.\n");
 										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
-										output.println("QUESTION1 상대방이 첫번째 문제를 틀렸렸습니다. 다시 풀고 있습니다.");
+										output.println("QUESTION1 "+name+"님이 첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.");
 									}
 									else {
-										tArea.append("첫번째 문제를 맞췄습니다.\n");
+										tArea.append(name+"님이 첫번째 문제를 맞췄습니다.\n");
 										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
-										output.println("QUESTION1 상대방이 첫번째 문제를 맞췄습니다.");	
+										output.println("QUESTION1 "+name+"님이 첫번째 문제를 맞췄습니다.");	
+									}
+
+								} catch (SQLException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							}
+						} else if(length1==600) {
+							int u = 0;
+							goDB db=new goDB("select*from question2");
+							while(u!=1) {
+								try {
+									u=db.question();
+									if(u!=1) {
+										tArea.append(name+"님이 첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.\n");
+										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
+										output.println("QUESTION1 "+name+"님이 첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.");
+									}
+									else {
+										tArea.append(name+"님이 첫번째 문제를 맞췄습니다.\n");
+										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
+										output.println("QUESTION1 "+name+"님이 첫번째 문제를 맞췄습니다.");	
 									}
 
 								} catch (SQLException e1) {
@@ -493,7 +540,7 @@ public class GoGoGame extends JFrame{
 	class MyThread extends Thread {
 		public void run() {
 			String command;
-			String otherName;
+			String otherName=null;
 			String otherFace;
 			JLabel otherName2=null;
 			JButton otherFace2=null;
@@ -515,9 +562,11 @@ public class GoGoGame extends JFrame{
 						otherFace2.setContentAreaFilled(false);
 						otherFace2.setFocusPainted(false);
 						add(otherFace2);
-					}
-					else if(command.startsWith("PRINT")) {
-						tArea.append(command.substring(6)+"\n");
+					} else if(command.startsWith("PRE"))  {
+						tArea.append(command.substring(4)+"\n");
+						tArea.setCaretPosition(tArea.getDocument().getLength());
+					} else if(command.startsWith("PRINT")) {
+						tArea.append(otherName+command.substring(6)+"\n");
 						tArea.setCaretPosition(tArea.getDocument().getLength()); // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨 
 					}else if(command.startsWith("OTHER")) {
 						int lastIndex=command.lastIndexOf(" ");
@@ -527,17 +576,25 @@ public class GoGoGame extends JFrame{
 						otherFace2.setBounds(otherFaceLength, 320, 180, 180);
 					}
 					else if(command.startsWith("RESULT")) {
-						tArea.append(command.substring(7)+"\n");
-						tArea.setCaretPosition(tArea.getDocument().getLength());   // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
+						output.println("FINAL "+name+command.substring(7));
+						//tArea.append(name+command.substring(7)+"\n");
+						//tArea.setCaretPosition(tArea.getDocument().getLength());   // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
 					} else if(command.startsWith("QUESTION1")) {
 						tArea.append(command.substring(10)+"\n");
 						tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
-					} else if(command.startsWith("END")) { 
-						tArea.append(command.substring(4)+"\n");
+					} else if(command.startsWith("MESSAGE")) {
+						tArea.append(command.substring(8)+"\n");
+						tArea.setCaretPosition(tArea.getDocument().getLength());
+					} else if(command.startsWith("FINAL")) {
+						tArea.append(command.substring(6)+"\n");
+						tArea.setCaretPosition(tArea.getDocument().getLength());
+					}
+					else if(command.startsWith("END")) { 
+						tArea.append(command.substring(4));
 						tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
 						removeKeyListener(kListener);
 						break;
-					}
+					} 
 
 				}
 			} catch (IOException e) {
