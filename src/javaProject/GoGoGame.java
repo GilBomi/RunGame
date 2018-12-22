@@ -70,6 +70,7 @@ public class GoGoGame extends JFrame{
 	private ImageIcon charSelectLeftButtonPressed=new ImageIcon(Main.class.getResource("../image/leftButtonPressed.png"));
 	private JButton gameStartButton=new JButton(new ImageIcon(Main.class.getResource("../image/gameStartImage.png")));
 	private Image nameSetImage=new ImageIcon(Main.class.getResource("../image/nameSetImage.png")).getImage();
+	private JButton description_word=new JButton(new ImageIcon(Main.class.getResource("../image/description_word.png")));
 	private int mouseX, mouseY;
 	private int charSelectNum=0;
 
@@ -387,6 +388,13 @@ public class GoGoGame extends JFrame{
 				startButton.setVisible(false);
 				background=new ImageIcon(Main.class.getResource("../image/introBackgroundBlur.png")).getImage();
 				backButton.setVisible(true);
+				
+				description_word.setVisible(true);
+				description_word.setBorderPainted(false);
+				description_word.setContentAreaFilled(false);
+				description_word.setFocusPainted(false);
+				description_word.setBounds(200,130,700,450);
+				add(description_word);
 			}
 		});
 		add(descriptionButton);
@@ -413,6 +421,7 @@ public class GoGoGame extends JFrame{
 				descriptionButton.setVisible(true);
 				exitButton1.setVisible(true);
 				backButton.setVisible(false);
+				description_word.setVisible(false);
 			}
 		});
 		add(backButton);

@@ -19,8 +19,8 @@ public class goDB {
 		con=null; // db 연결 설정하는 인터페이스
 		String name="org.gjt.mm.mysql.Driver";
 		String url="jdbc:mysql://localhost:3306/javaproject?useSSL=false&useUnicode=true&characterEncoding=euckr";
-		String user="root";
-		String password="bomi1122";
+		String user="puser";
+		String password="1234";
 
 		try {
 			Class.forName(name); // jdbc 드라이버 적재(초석)
