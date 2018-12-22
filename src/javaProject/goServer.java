@@ -131,8 +131,8 @@ class Player extends Thread {
 					int lastIndex=command.lastIndexOf(" ");
 					if(Integer.parseInt(command.substring(lastIndex+1))==880) {
 						System.out.println("880 됨");
-						other.output.println("RESULT 졌습니다. 다음엔 이길 수 있을거에요.");
-						output.println("RESULT 이겼습니다! 축하합니다!");
+						other.output.println("RESULT ***졌습니다. 다음엔 이길 수 있을거에요.***");
+						output.println("RESULT ***이겼습니다! 축하합니다!***");
 						
 						output.println("END 게임을 종료합니다.");
 						other.output.println("END 게임을 종료합니다.");

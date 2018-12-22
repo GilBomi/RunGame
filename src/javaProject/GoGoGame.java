@@ -178,23 +178,28 @@ public class GoGoGame extends JFrame{
 				//Border border = BorderFactory.createLineBorder(Color.PINK); 
 				Border linebor = BorderFactory.createLineBorder(new Color(0xF2A6A6), 5);
 				tArea=new JTextArea(7,300);
+
+				JTextField tField=new JTextField(200);
+				tField.setBounds(300, 650, 500, 25);
+				tField.setVisible(true);
 				
+				add(tField);
 				
-				tArea.setBounds(300,500,500,200);
+				//tArea.setBounds(300,400,500,200);
 				tArea.setEditable(false);
 				tArea.setVisible(true);
-				JScrollPane scrollPane=new JScrollPane(tArea);
-				
-				scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+				JScrollPane scrollPane=new JScrollPane(tArea,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				scrollPane.setBounds(300,500,500,150);
 
-				tArea.setBorder(BorderFactory.createCompoundBorder(linebor, 
-						BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+				//scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+				scrollPane.setBorder(BorderFactory.createCompoundBorder(linebor, BorderFactory.createEmptyBorder(0, 0, 0, 0)));
 				//add(tArea);
-				//add(scrollPane);
-				add(tArea);
+				add(scrollPane);
+				//add(tArea);
 				//getContentPane().add(scrollPane);
-				
-				
+
+
 				// goClient 생성자 메소드 내용
 				try {
 					socket = new Socket("localhost",9003);
@@ -249,13 +254,15 @@ public class GoGoGame extends JFrame{
 									u=db.question();
 									if(u!=1) {
 										tArea.append("첫번째 문제를 틀렸습니다. 다시 풀고 있습니다.\n");
+										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
 										output.println("QUESTION1 상대방이 첫번째 문제를 틀렸렸습니다. 다시 풀고 있습니다.");
 									}
 									else {
 										tArea.append("첫번째 문제를 맞췄습니다.\n");
+										tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
 										output.println("QUESTION1 상대방이 첫번째 문제를 맞췄습니다.");	
 									}
-										
+
 								} catch (SQLException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
@@ -509,25 +516,29 @@ public class GoGoGame extends JFrame{
 						otherFace2.setFocusPainted(false);
 						add(otherFace2);
 					}
-					else if(command.startsWith("PRINT")) 
+					else if(command.startsWith("PRINT")) {
 						tArea.append(command.substring(6)+"\n");
-					else if(command.startsWith("OTHER")) {
+						tArea.setCaretPosition(tArea.getDocument().getLength()); // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨 
+					}else if(command.startsWith("OTHER")) {
 						int lastIndex=command.lastIndexOf(" ");
 						int otherNameLength=Integer.parseInt(command.substring(6,lastIndex));
 						int otherFaceLength=Integer.parseInt(command.substring(lastIndex+1));
 						otherName2.setBounds(otherNameLength,300,100,50);
 						otherFace2.setBounds(otherFaceLength, 320, 180, 180);
 					}
-					else if(command.startsWith("RESULT")) 
+					else if(command.startsWith("RESULT")) {
 						tArea.append(command.substring(7)+"\n");
-					else if(command.startsWith("QUESTION1"))
+						tArea.setCaretPosition(tArea.getDocument().getLength());   // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
+					} else if(command.startsWith("QUESTION1")) {
 						tArea.append(command.substring(10)+"\n");
-					else if(command.startsWith("END")) { 
+						tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
+					} else if(command.startsWith("END")) { 
 						tArea.append(command.substring(4)+"\n");
+						tArea.setCaretPosition(tArea.getDocument().getLength());  // 이 코드를 append 밑에 추가해주면 항상 아래로 스크롤됨
 						removeKeyListener(kListener);
 						break;
 					}
-					
+
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
