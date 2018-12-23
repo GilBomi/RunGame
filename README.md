@@ -57,6 +57,9 @@ _0은 '예'를 의미하고 1은 '아니요'를 의미_
 __저작권__
 
 [music] :Arrival by MBB https://soundcloud.com/mbbofficial
+
 Creative Commons — Attribution-ShareAlike 3.0 Unported  — CC BY-SA 3.0 
+
 http://creativecommons.org/licenses/b...
+
 Music promoted by Audio Library https://youtu.be/qZHipfdE4s8
