@@ -23,7 +23,8 @@ __소스코드 받아서 쓸 때 수정해야될 점__
 
 4. 'javaproject'데이터베이스 안에 밑의 코드 넣기
 
-```create table question1(
+```
+create table question1(
 id int primary key,
 name varchar(50),
 answer int);
@@ -35,7 +36,8 @@ answer int);
 ```
 
 5. 위에서 만든 테이블 'question1'과 'question2'에 밑의 데이터 넣기
-```insert into question values(0,'The capital of Taiwan is Taipei.',0);
+```
+insert into question values(0,'The capital of Taiwan is Taipei.',0);
 insert into question values(1,'The capital of Nepal is Jakarta.',1);
 insert into question values(2,'The person who made the Eiffel Tower is Eiffel.',0);
 insert into question values(3,'The hedgehog hibernates.',0);
