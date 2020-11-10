@@ -54,6 +54,10 @@ insert into question2 values(5,'71-53=28',1);
 
 _0은 '예'를 의미하고 1은 '아니요'를 의미_
 
+__시연 영상__
+
+https://www.youtube.com/watch?v=8p_s2qwhSmA&feature=youtu.be
+
 __저작권__
 
 [music] :Arrival by MBB https://soundcloud.com/mbbofficial
@@ -65,3 +69,4 @@ http://creativecommons.org/licenses/b...
 Music promoted by Audio Library https://youtu.be/qZHipfdE4s8
 
 Image promoted by BT21
+
